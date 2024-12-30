@@ -30,7 +30,7 @@ const GameHandler = ({ numberOfLights = 25 }) => {
             setHasWon(true);
         }
     }, [lightsOn, numberOfLights]);
-
+    //Fixed
     const lightToggle = (lightIds) => {
         setLightsOn((prevLights) => {
             const updatedLights = new Set(prevLights);
