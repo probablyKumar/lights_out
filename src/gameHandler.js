@@ -46,7 +46,7 @@ const GameHandler = ({ numberOfLights = 25 }) => {
             return Array.from(updatedLights);
         });
     };
-
+    //Getting the nearby tiles
     const getAdjacentLights = (lightId) => {
         const gridSize = Math.sqrt(numberOfLights);
         const row = Math.floor((lightId - 1) / gridSize);
