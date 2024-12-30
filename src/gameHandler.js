@@ -10,12 +10,11 @@ const GameHandler = ({ numberOfLights = 25 }) => {
     const [scaleAdjusted, setScaleAdjusted] = useState(false);
     const gameContainerRef = useRef(null);
 
-    // Adjust zoom for screen scaling
     useEffect(() => {
         const adjustZoomForScale = () => {
-            const devicePixelRatio = window.devicePixelRatio; // Get the current scale factor
+            const devicePixelRatio = window.devicePixelRatio;
             if (devicePixelRatio > 1) {
-                const zoomLevel = 1 / devicePixelRatio; // Calculate zoom adjustment
+                const zoomLevel = 1 / devicePixelRatio;
                 if (gameContainerRef.current) {
                     gameContainerRef.current.style.zoom = zoomLevel;
                 }
@@ -24,16 +23,14 @@ const GameHandler = ({ numberOfLights = 25 }) => {
         };
 
         adjustZoomForScale();
-    }, []); // Runs only on component mount
+    }, []);
 
-    // Check if the game is won
     useEffect(() => {
-        if (lightsOn.length >= numberOfLights - 1) {
+        if (lightsOn.length === numberOfLights) {  // Check if all lights are on
             setHasWon(true);
         }
     }, [lightsOn, numberOfLights]);
 
-    // Toggle lights based on selected light
     const lightToggle = (lightIds) => {
         setLightsOn((prevLights) => {
             const updatedLights = new Set(prevLights);
@@ -50,10 +47,9 @@ const GameHandler = ({ numberOfLights = 25 }) => {
         });
     };
 
-    // Calculate adjacent lights for a given light
     const getAdjacentLights = (lightId) => {
-        const gridSize = Math.sqrt(numberOfLights); // Assuming a square grid
-        const row = Math.floor((lightId - 1) / gridSize); // Calculate the row of the current light
+        const gridSize = Math.sqrt(numberOfLights);
+        const row = Math.floor((lightId - 1) / gridSize);
 
         const adjacentOffsets = [-1, 1, -gridSize, gridSize];
 
@@ -61,39 +57,32 @@ const GameHandler = ({ numberOfLights = 25 }) => {
             .map((offset) => {
                 const adjacentId = lightId + offset;
 
-                // Check if the adjacent light is valid
-                if (adjacentId < 1 || adjacentId > numberOfLights) return null; // Out of bounds
+                if (adjacentId < 1 || adjacentId > numberOfLights) return null;
 
                 const adjacentRow = Math.floor((adjacentId - 1) / gridSize);
 
-                // Ensure horizontal adjacency does not wrap between rows
                 if (Math.abs(offset) === 1 && adjacentRow !== row) return null;
 
                 return adjacentId;
             })
-            .filter((id) => id !== null); // Filter out invalid lights
+            .filter((id) => id !== null);
     };
 
-
-    // Handle light click
     const handleLightClick = (lightId) => {
         if (!lightsOn.includes(lightId)) {
             const adjacentLights = getAdjacentLights(lightId);
             lightToggle([lightId, ...adjacentLights]);
         } else {
-            // Handle invalid click (already on)
             setErrorClick(lightId);
             setTimeout(() => setErrorClick(null), 1000);
         }
     };
 
-    // Handle hover start
     const handleHoverStart = (lightId) => {
         const adjacentLights = getAdjacentLights(lightId);
         setBeingHovered(adjacentLights);
     };
 
-    // Handle hover end
     const handleHoverEnd = () => {
         setBeingHovered([]);
     };
@@ -116,7 +105,6 @@ const GameHandler = ({ numberOfLights = 25 }) => {
                         />
                         {scaleAdjusted && (
                             <p className="scale-Notification">
-
                             </p>
                         )}
                     </>
