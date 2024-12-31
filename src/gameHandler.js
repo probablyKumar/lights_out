@@ -10,7 +10,15 @@ const GameHandler = ({ numberOfLights = 25, devMode = false }) => {
     const [scaleAdjusted, setScaleAdjusted] = useState(false);
     const [difficulty, setDifficulty] = useState(null);
     const [isAnimating, setIsAnimating] = useState(false); // Track animation state
+    const [buttonTitles, setButtonTitles] = useState({
+        easy: 'Easy',
+        regular: 'Regular',
+        hard: 'Hard'
+    }); // State to manage button titles
     const gameContainerRef = useRef(null);
+
+    // Track the timeout ID for the mouse hover
+    const hoverTimeoutRef = useRef(null);
 
     // Automatically enable devMode lights if it's set to true
     useEffect(() => {
@@ -94,6 +102,11 @@ const GameHandler = ({ numberOfLights = 25, devMode = false }) => {
 
     const handleHoverEnd = () => {
         setBeingHovered([]);
+        // Clear any existing timeout if mouse leaves early
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = null;
+        }
     };
 
     const startGame = (selectedDifficulty) => {
@@ -114,6 +127,39 @@ const GameHandler = ({ numberOfLights = 25, devMode = false }) => {
         }
     };
 
+    const handleMouseEnter = (difficulty) => {
+        // Only execute if the mouse has been hovering for more than 700ms
+        hoverTimeoutRef.current = setTimeout(() => {
+            const newTitles = { ...buttonTitles };
+            if (difficulty === 'easy') {
+                newTitles.easy = 'Easy Mode with no lights lock in!';
+            } else if (difficulty === 'regular') {
+                newTitles.regular = 'A balanced mode with lights locked in!';
+            } else if (difficulty === 'hard') {
+                newTitles.hard = 'Hardest Mode with already lit Lights';
+            }
+            setButtonTitles(newTitles);
+        }, 700); // 700ms delay
+    };
+
+    const handleMouseLeave = (difficulty) => {
+        // Clear the hover timeout if the mouse leaves early
+        if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+            hoverTimeoutRef.current = null;
+        }
+
+        const newTitles = { ...buttonTitles };
+        if (difficulty === 'easy') {
+            newTitles.easy = 'Easy';
+        } else if (difficulty === 'regular') {
+            newTitles.regular = 'Regular';
+        } else if (difficulty === 'hard') {
+            newTitles.hard = 'Hard';
+        }
+        setButtonTitles(newTitles);
+    };
+
     return (
         <div className="game-Body">
             {!difficulty ? (
@@ -124,23 +170,29 @@ const GameHandler = ({ numberOfLights = 25, devMode = false }) => {
                     </h2>
                     <button
                         onClick={() => startGame('easy')}
+                        onMouseEnter={() => handleMouseEnter('easy')}
+                        onMouseLeave={() => handleMouseLeave('easy')}
                         className={`difficulty-Button ${isAnimating ? 'no-pointer-events' : ''}`}
                     >
-                        Easy
+                        {buttonTitles.easy}
                     </button>
                     <p className="difficulty-Description">Easy Mode with no lights lock in!</p>
                     <button
                         onClick={() => startGame('regular')}
+                        onMouseEnter={() => handleMouseEnter('regular')}
+                        onMouseLeave={() => handleMouseLeave('regular')}
                         className={`difficulty-Button ${isAnimating ? 'no-pointer-events' : ''}`}
                     >
-                        Regular
+                        {buttonTitles.regular}
                     </button>
                     <p className="difficulty-Description">A balanced mode with lights locked in!</p>
                     <button
                         onClick={() => startGame('hard')}
+                        onMouseEnter={() => handleMouseEnter('hard')}
+                        onMouseLeave={() => handleMouseLeave('hard')}
                         className={`difficulty-Button ${isAnimating ? 'no-pointer-events' : ''}`}
                     >
-                        Hard
+                        {buttonTitles.hard}
                     </button>
                     <p className="difficulty-Description">Hardest Mode with already lit Lights</p>
                 </div>
