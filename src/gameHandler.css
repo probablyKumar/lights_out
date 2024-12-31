@@ -2,10 +2,6 @@
     --text-shadow-dark: rgb(13, 173, 194);
     --text-shadow-light: rgb(12, 173, 179);
     --text-gradient: rgba(255,175,75,1);
-    background: -moz-linear-gradient(to right, rgba(255,175,75,1) 0%, rgba(255,146,10,1) 100%);
-    background: -webkit-linear-gradient(to right, rgba(255,175,75,1) 0%, rgba(255,146,10,1) 100%);
-    background: -o-linear-gradient(to right, rgba(255,175,75,1) 0%, rgba(255,146,10,1) 100%);
-    background: -ms-linear-gradient(to right, rgba(255,175,75,1) 0%, rgba(255,146,10,1) 100%);
     background: linear-gradient(to right, rgba(255,175,75,1) 0%, rgba(255,146,10,1) 100%);
     --text-filter: filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffaf4b', endColorstr='#ff920a', GradientType=1 );
 }
@@ -15,10 +11,100 @@
     src: local('NEONLights'), url(./fonts/NEON____.TTF) format('truetype');
 }
 
-.game-Body {
-    margin-top: 13.5%;
+.difficulty-Selector {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
     width: 100%;
-    height: 100%;
+    height: 25%;
+    max-width: 100%;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: black;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    background-color: rgba(0, 0, 0, 0.2);
+
+    filter: drop-shadow(5px 5px 2px black);
+
+}
+
+
+
+
+.difficulty-Selector > h1 {
+    display: none;
+}
+
+.difficulty-Selector > h2 {
+    margin-right: 5%;
+}
+
+.difficulty-Button {
+    font-size: 1.5rem;
+    font-family: "Bahnschrift";
+    font-weight: bold;
+    color: white;
+    padding: 15px 25px;
+    background: none;
+    border: 2px;
+
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+    width: 10%;
+    display: inline-block;
+    position: relative;
+    transition: transform 1s ease-in-out;
+}
+
+.difficulty-Button {
+    position: relative;
+    padding: 10px 20px;
+    transition: transform 0.3s ease-in-out;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+}
+
+.difficulty-Button:hover {
+    box-shadow: 0 6px 15px rgba(0, 255, 255, 0.4);
+    background: linear-gradient(145deg, #a1c4fd, #c2e9fb);
+    box-shadow: 0 8px 20px black;
+    width: 15%;
+    transition: width 0.4s ease-in-out;
+}
+
+.difficulty-Description {
+    font-size: 1rem;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 15px;
+    text-align: center;
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    transition: width 0.4s ease, opacity 0.4s ease 0.4s;
+}
+
+.difficulty-Button:hover + .difficulty-Description {
+    opacity: 1;
+    width: 10%;
+    transition: width 0.4s ease, opacity 0.4s ease 0.4s;
+}
+
+
+.game-Body {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .game-Container {
@@ -27,13 +113,16 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
 }
 
 .game-Title {
     margin: 0;
     color: white;
     font-family: NEONLights, sans-serif;
-    background-color: rgba(248, 250, 250, 0);
     font-size: 4rem;
     font-weight: 50;
     text-shadow:
@@ -56,7 +145,6 @@
     margin: 0;
     color: white;
     font-family: NEONLights, sans-serif;
-    background-color: rgba(248, 250, 250, 0);
     font-size: 20rem;
     font-weight: 50;
     text-shadow:
@@ -69,12 +157,6 @@
             0 0 102px var(--text-shadow-dark),
             0 0 151px var(--text-shadow-dark);
     animation: flickerToFull 2s infinite alternate;
-}
-
-@keyframes workingGradient {
-    0% { background-position: 0% 58%; filter: drop-shadow(20px 20px 20px rgb(47, 218, 275)); }
-    50% { background-position: 100% 43%; filter: drop-shadow(20px 20px 20px rgb(45, 228, 265)); }
-    100% { background-position: 0% 58%; filter: drop-shadow(20px 20px 20px rgb(43, 248, 255)); }
 }
 
 @keyframes flicker {
@@ -95,7 +177,7 @@
         text-shadow: none;
         color: goldenrod;
     }
-    20%, 21.999%, 63%, 63.999%, 65%, 69.999% {
+    20%, 21.999%, 63%, 63.999%, 65%, 69.999%, 71%, 99.999%, 51%, 52.999%, 54%, 59.999%, 66% {
         filter: drop-shadow(50px 50px 50px rgb(47, 218, 275));
         color: rgba(218, 165, 32, 0.103);
     }

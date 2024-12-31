@@ -2,35 +2,31 @@ import React, { useState, useEffect, useRef } from 'react';
 import Light from './lightHandler';
 import './gameHandler.css';
 
-const GameHandler = ({ numberOfLights = 25 }) => {
+const GameHandler = ({ numberOfLights = 25, devMode = false }) => {
     const [lightsOn, setLightsOn] = useState([]);
     const [beingHovered, setBeingHovered] = useState([]);
     const [hasWon, setHasWon] = useState(false);
     const [errorClick, setErrorClick] = useState(null);
     const [scaleAdjusted, setScaleAdjusted] = useState(false);
+    const [difficulty, setDifficulty] = useState(null);
+    const [isAnimating, setIsAnimating] = useState(false); // Track animation state
     const gameContainerRef = useRef(null);
 
+    // Automatically enable devMode lights if it's set to true
     useEffect(() => {
-        const adjustZoomForScale = () => {
-            const devicePixelRatio = window.devicePixelRatio;
-            if (devicePixelRatio > 1) {
-                const zoomLevel = 1 / devicePixelRatio;
-                if (gameContainerRef.current) {
-                    gameContainerRef.current.style.zoom = zoomLevel;
-                }
-                setScaleAdjusted(true);
-            }
-        };
-
-        adjustZoomForScale();
-    }, []);
-
-    useEffect(() => {
-        if (lightsOn.length === numberOfLights) {  // Check if all lights are on
+        if (devMode) {
+            const allLightsOn = Array.from({ length: numberOfLights }, (_, i) => i + 1); // All lights turned on
+            setLightsOn(allLightsOn);
             setHasWon(true);
         }
-    }, [lightsOn, numberOfLights]);
-    //Fixed
+    }, [devMode, numberOfLights]);
+
+    useEffect(() => {
+        if (!devMode && lightsOn.length === numberOfLights) {
+            setHasWon(true);
+        }
+    }, [lightsOn, numberOfLights, devMode]);
+
     const lightToggle = (lightIds) => {
         setLightsOn((prevLights) => {
             const updatedLights = new Set(prevLights);
@@ -46,7 +42,7 @@ const GameHandler = ({ numberOfLights = 25 }) => {
             return Array.from(updatedLights);
         });
     };
-    //Getting the nearby tiles
+
     const getAdjacentLights = (lightId) => {
         const gridSize = Math.sqrt(numberOfLights);
         const row = Math.floor((lightId - 1) / gridSize);
@@ -69,12 +65,25 @@ const GameHandler = ({ numberOfLights = 25 }) => {
     };
 
     const handleLightClick = (lightId) => {
-        if (!lightsOn.includes(lightId)) {
+        if (difficulty === 'easy') {
             const adjacentLights = getAdjacentLights(lightId);
             lightToggle([lightId, ...adjacentLights]);
-        } else {
-            setErrorClick(lightId);
-            setTimeout(() => setErrorClick(null), 1000);
+        } else if (difficulty === 'regular') {
+            if (!lightsOn.includes(lightId)) {
+                const adjacentLights = getAdjacentLights(lightId);
+                lightToggle([lightId, ...adjacentLights]);
+            } else {
+                setErrorClick(lightId);
+                setTimeout(() => setErrorClick(null), 1000);
+            }
+        } else if (difficulty === 'hard') {
+            if (!lightsOn.includes(lightId)) {
+                const adjacentLights = getAdjacentLights(lightId);
+                lightToggle([lightId, ...adjacentLights]);
+            } else {
+                setErrorClick(lightId);
+                setTimeout(() => setErrorClick(null), 1000);
+            }
         }
     };
 
@@ -87,31 +96,79 @@ const GameHandler = ({ numberOfLights = 25 }) => {
         setBeingHovered([]);
     };
 
+    const startGame = (selectedDifficulty) => {
+        setDifficulty(selectedDifficulty);
+        setLightsOn([]);
+        setHasWon(false);
+        setIsAnimating(true); // Animation started
+
+        setTimeout(() => {
+            setIsAnimating(false); // Reset animation state after animation duration
+        }, 400); // Adjust duration based on the animation time
+
+        if (selectedDifficulty === 'hard') {
+            const preLitLights = Array.from({ length: Math.ceil(numberOfLights / 5) }, () =>
+                Math.floor(Math.random() * numberOfLights) + 1
+            );
+            setLightsOn(preLitLights);
+        }
+    };
+
     return (
         <div className="game-Body">
-            <div className="game-Container" ref={gameContainerRef}>
-                {!hasWon ? (
-                    <>
-                        <h1 className="game-Title">
-                            LIGHTS<span className="game-Title-Two">OUT</span>
-                        </h1>
-                        <Light
-                            returnClickedEvent={handleLightClick}
-                            clearHover={handleHoverEnd}
-                            returnHoveredEvent={handleHoverStart}
-                            lightsOn={lightsOn}
-                            beingHovered={beingHovered}
-                            errorClick={errorClick}
-                        />
-                        {scaleAdjusted && (
-                            <p className="scale-Notification">
-                            </p>
-                        )}
-                    </>
-                ) : (
-                    <h1 className="game-Won">YOU WON!</h1>
-                )}
-            </div>
+            {!difficulty ? (
+                <div className="difficulty-Selector">
+
+                    <h2 className="game-Title">
+                        LIGHTS<span className="game-Title-Two">OUT</span>
+                    </h2>
+                    <button
+                        onClick={() => startGame('easy')}
+                        className={`difficulty-Button ${isAnimating ? 'no-pointer-events' : ''}`}
+                    >
+                        Easy
+                    </button>
+                    <p className="difficulty-Description">Easy Mode with no lights lock in!</p>
+                    <button
+                        onClick={() => startGame('regular')}
+                        className={`difficulty-Button ${isAnimating ? 'no-pointer-events' : ''}`}
+                    >
+                        Regular
+                    </button>
+                    <p className="difficulty-Description">A balanced mode with lights locked in!</p>
+                    <button
+                        onClick={() => startGame('hard')}
+                        className={`difficulty-Button ${isAnimating ? 'no-pointer-events' : ''}`}
+                    >
+                        Hard
+                    </button>
+                    <p className="difficulty-Description">Hardest Mode with already lit Lights</p>
+                </div>
+            ) : (
+                <div className="game-Container" ref={gameContainerRef}>
+                    {!hasWon ? (
+                        <>
+                            <h1 className="game-Title">
+                                LIGHTS<span className="game-Title-Two">OUT</span>
+                            </h1>
+                            <Light
+                                returnClickedEvent={handleLightClick}
+                                clearHover={handleHoverEnd}
+                                returnHoveredEvent={handleHoverStart}
+                                lightsOn={lightsOn}
+                                beingHovered={beingHovered}
+                                errorClick={errorClick}
+                            />
+                            {scaleAdjusted && (
+                                <p className="scale-Notification">
+                                </p>
+                            )}
+                        </>
+                    ) : (
+                        <h1 className="game-Won">YOU WON!</h1>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
