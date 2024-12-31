@@ -14,13 +14,12 @@ const GameHandler = ({ numberOfLights = 25, devMode = false }) => {
         easy: 'Easy',
         regular: 'Regular',
         hard: 'Hard'
-    }); // State to manage button titles
+    });
     const gameContainerRef = useRef(null);
 
-    // Track the timeout ID for the mouse hover
+
     const hoverTimeoutRef = useRef(null);
 
-    // Automatically enable devMode lights if it's set to true
     useEffect(() => {
         if (devMode) {
             const allLightsOn = Array.from({ length: numberOfLights }, (_, i) => i + 1); // All lights turned on
@@ -139,11 +138,10 @@ const GameHandler = ({ numberOfLights = 25, devMode = false }) => {
                 newTitles.hard = 'Hardest Mode with already lit Lights';
             }
             setButtonTitles(newTitles);
-        }, 700); // 700ms delay
+        }, 700);
     };
 
     const handleMouseLeave = (difficulty) => {
-        // Clear the hover timeout if the mouse leaves early
         if (hoverTimeoutRef.current) {
             clearTimeout(hoverTimeoutRef.current);
             hoverTimeoutRef.current = null;
